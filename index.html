@@ -99,7 +99,10 @@
 						i *= 30;
 						return i;
 					})
-					.attr('fill', 'green');
+					.attr('fill', 'green')
+					.attr('id', (d, i) => i)
+					.attr('building', (d, i) => d.building)
+					.attr('building-height', (d, i) => d.height_m);
 
 				var texts = svg.selectAll('text')
 								.data(sortedBuildings)
@@ -128,14 +131,19 @@
 					})
 					.attr('text-anchor', 'middle');
 
-				svg.selectAll('.bar')
-					.data(sortedBuildings)
-					.enter()
-					.append('rect')
-					.attr('class', 'bar')
-					.on('click', function(d) {
-						
+				let bars = document.querySelectorAll('rect');
+				
+				bars.forEach(bar => {
+					bar.addEventListener('click', function(event) {
+						let id = Number(event.target.id) + 1;
+						d3.select('.building-image')
+							.attr('src', 'img/' + id + '.jpg');
+						d3.select('.building')
+							.text(event.target.getAttribute('building'));
+						d3.select('.height')
+							.text(event.target.getAttribute('building-height') + ' meters');
 					});
+				});
 			});
 		</script>
 
@@ -157,9 +165,9 @@
 					<div class="bar-plot"></div>
 				</div>
 				<div class="col">
-					<h3 class="building">Testing</h3>
-					<h4 class="height">50 ft</h4>
-					<img src="img/1.jpg">
+					<h3 class="building"></h3>
+					<h4 class="height"></h4>
+					<img class="building-image" src="">
 				</div>
 			</div>
 		</div>
