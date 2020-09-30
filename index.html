@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Lab 3: D3 and SVG</title>
+		<script src="https://d3js.org/d3.v6.min.js"></script>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    </head>
+    <body>
+        <script type="text/javascript">
+            // d3.csv('cities.csv').then(data=>{
+			// console.log('cities', data);
+			// });
+
+			// d3.csv('cities.csv', d=>{
+  			// 	return {
+    		// 	...d, // spread operator
+    		// 	eu: d.eu==='true', // convert to boolean
+    		// 	population: +d.population,
+    		// 	x: +d.x,
+    		// 	y: +d.y,
+  			// 	}
+			// }).then(data=>{
+			// 	console.log('cities', data);
+			// });
+
+			// Population of European Countries
+			const cities = d3.csv('cities.csv', d3.autoType).then(data=>{
+				return data;
+			});
+
+			d3.csv('cities.csv', d3.autoType).then(data=>{
+				return data.filter(datum=>datum.eu === true);
+			}).then(data=>{
+				d3.select('.city-count').text(data.length);
+			});
+
+			console.log(cities);
+
+			d3.csv('cities.csv', d3.autoType).then(data=>{
+				const width = 700;
+				const height = 550;
+				const svg = d3.select('.population-plot')
+					.append('svg')
+					.attr('width', width)
+					.attr('height', height);
+
+				svg.selectAll('circle')
+					.data(data)
+					.enter()
+					.append('circle')
+					.attr('cx', (d, i) => d.x)
+					.attr('cy', (d, i) => d.y)
+					.attr('r', function(d, i) {
+						if (d.population < 1000000) {
+							return '4px';
+						} 
+						return '8px';
+					})
+					.attr('fill', 'red');
+
+				const greaterPopulation = data.filter(data => data.population > 1000000);
+				svg.selectAll('text')
+					.data(greaterPopulation)
+					.enter()
+					.append('text')
+					.attr('x', (d, i) => d.x)
+					.attr('y', (d, i) => d.y)
+					.text((d, i) => d.city)
+					.attr('text-anchor', 'middle');
+			});
+
+			const buildings = d3.csv('buildings.csv', d3.autoType).then(data=>{
+				return data;
+			});
+
+			console.log(buildings);
+
+			d3.csv('buildings.csv', d3.autoType).then(data=>{
+				const sortedBuildings = data.sort((a, b)=>b.height_m - a.height_m);
+				console.log(sortedBuildings);
+
+				const width = 600;
+				const height = 500;
+				const svg = d3.select('.bar-plot')
+					.append('svg')
+					.attr('width', width)
+					.attr('height', height);
+
+				svg.selectAll('rect')
+					.data(sortedBuildings)
+					.enter()
+					.append('rect')
+					.attr('width', (d, i) => d.height_px)
+					.attr('height', 15)
+					.attr('x', 250)
+					.attr('y', function(d, i) {
+						i += 1;
+						i *= 30;
+						return i;
+					})
+					.attr('fill', 'green');
+
+				var texts = svg.selectAll('text')
+								.data(sortedBuildings)
+								.enter();
+
+				texts.append('text')
+					.text(function(d) {
+						return d.building;
+					})
+					.attr('x', 10)
+					.attr('y', function(d, i) {
+						i += 1.4;
+						i *= 30;
+						return i;
+					});
+					
+				texts.append('text')
+					.text(function(d) {
+						return d.height_m;
+					})
+					.attr('x', 550)
+					.attr('y', function(d, i) {
+						i += 1.4;
+						i *= 30;
+						return i;
+					})
+					.attr('text-anchor', 'middle');
+
+				svg.selectAll('.bar')
+					.data(sortedBuildings)
+					.enter()
+					.append('rect')
+					.attr('class', 'bar')
+					.on('click', function(d) {
+
+					});
+			});
+		</script>
+
+		<div class="container">
+			<h2>
+				Population of European countries
+			</h2>
+			<div class="city-count"></div>
+			<div class="population-plot"></div>
+		</div>
+
+		<div class="container">
+			<div class="row">
+				<div class="col">
+					<h2>
+						Heights of the Tallest Buildings
+					</h2>
+					<div class="height-count"></div>
+					<div class="bar-plot"></div>
+				</div>
+				<div class="col">
+					<h3 class="building">Testing</h3>
+					<h4 class="height">50 ft</h4>
+					<img src="img/1.jpg">
+				</div>
+			</div>
+		</div>
+		
+    </body>
+</html>
